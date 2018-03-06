@@ -3,8 +3,8 @@ import signal
 
 from translation_client import translation_client
 
-DEFAULT_SRC_LANG = 'en'
-DEFAULT_TARGET_LANG = 'es'
+DEFAULT_SRC_LANG = u'en'
+DEFAULT_TARGET_LANG = u'es'
 DEFAULT_BIND_HOST = 'localhost'
 DEFAULT_BIND_PORT = 8090
 DEFAULT_MAX_QUEUED_CONN = 1
@@ -29,6 +29,11 @@ class TranslationHub(object):
                         max_queued_conn=DEFAULT_MAX_QUEUED_CONN, 
                         accept_timeout=DEFAULT_ACCEPT_TIMEOUT,
                         recv_timeout=DEFAULT_RECV_TIMEOUT):
+        
+        assert isinstance(service_username, unicode)
+        assert isinstance(service_password, unicode)
+        assert isinstance(src_lang, unicode)
+        assert isinstance(target_lang, unicode)
         
         tc = translation_client.TranslationClient(
             service_username, 
@@ -71,20 +76,20 @@ class TranslationHub(object):
                 
                 conn.settimeout(recv_timeout)
                 
-                string = ''                                                     #
-                                                                                #
-                while not string.endswith('\0'):                                #
-                    try:                                                        #
-                        substring = conn.recv(4096)                             #
-                    except socket.timeout:                                      #
-                        break                                                   #
-                                                                                #   TODO: Review encondings at recive time, 
-                    if not substring:                                           #         at translate time and also review 
-                        break                                                   #         the end-mark with respect to codec.
-                                                                                #
-                    string += substring                                         #
-                else:                                                           #
-                    uuid = tc.translate(string[: -1], src_lang, target_lang)    #
+                string = ''
+                
+                while not string.endswith('\0'):
+                    try:
+                        substring = conn.recv(4096)
+                    except socket.timeout:
+                        break
+                    
+                    if not substring:
+                        break
+                    
+                    string += substring
+                else:
+                    uuid = tc.translate(string[: -1].decode('utf-8'), src_lang, target_lang)
                     continue
                 
                 try:

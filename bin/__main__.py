@@ -9,4 +9,4 @@ sys.path.append('/media/sf_translation')  # from translation_client import trans
 from translation_hub import translation_hub
 
 
-translation_hub.TranslationHub.serve_forever('user1', 'passwd1')
+translation_hub.TranslationHub.serve_forever(u'user1', u'passwd1')
