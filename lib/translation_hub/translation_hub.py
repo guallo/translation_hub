@@ -89,7 +89,14 @@ class TranslationHub(object):
                     
                     string += substring
                 else:
-                    uuid = tc.translate(string[: -1].decode('utf-8'), src_lang, target_lang)
+                    try:
+                        uuid = tc.translate(string[: -1].decode('utf-8'), src_lang, target_lang)
+                    except AssertionError, e:
+                        if e.message == 'expired session':
+                            tc.relogin()
+                            uuid = tc.translate(string[: -1].decode('utf-8'), src_lang, target_lang)
+                        else:
+                            raise
                     continue
                 
                 try:
